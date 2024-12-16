@@ -7,9 +7,6 @@ COPY . ./
 
 RUN npm install
 RUN npm run build
-RUN apt-get update && apt-get remove python3-pip -y && \
-    python -m ensurepip --upgrade && \
-    python -m pip install --upgrade pip
 
 FROM nginx:1.19.3-alpine AS production-stage
 
