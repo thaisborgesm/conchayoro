@@ -1,20 +1,23 @@
+# Etapa de build
 FROM node:18-alpine AS build-stage
 
 WORKDIR /app
 
 COPY package*.json ./
-COPY . .
+COPY . ./
 
 RUN npm install
 RUN npm run build
+RUN npm run export  # Gera os arquivos estáticos na pasta "out"
 
+# Etapa de produção com Nginx
 FROM nginx:1.19.3-alpine AS production-stage
 
-COPY --from=build-stage /app/.next /usr/share/nginx/html
+# Copia os arquivos estáticos exportados
+COPY --from=build-stage /app/out /usr/share/nginx/html
 
 EXPOSE 80
 
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost/ || exit 1
-
 CMD ["nginx", "-g", "daemon off;"]
+
 
